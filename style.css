@@ -26,7 +26,7 @@ button.theme{transition:box-shadow .25s ease,border-color .25s ease,color .25s e
 button.theme:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent),0 0 20px color-mix(in srgb,var(--accent) 50%,transparent)}
 
 /* Hero */
-.hero{padding:4.5rem 0 5rem}
+.hero{position:relative;padding:4.5rem 0 5rem}
 .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(3rem,10.5vw,8.5rem);line-height:.95;letter-spacing:-.035em;margin:0 0 2rem}
 .hero h1 span{display:block}
 .hero h1 .role{color:var(--accent)}
@@ -102,9 +102,9 @@ body{overflow-wrap:break-word}
 .hero h1{font-size:clamp(2.2rem,9.5vw,8.5rem);overflow-wrap:break-word}
 .projects .shot.has-img a{display:block}
 
-/* Panah kecil: penanda bahwa proyek bisa dibuka/ditutup */
-.projects summary h3::after{content:"";display:inline-block;width:.38em;height:.38em;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:.6em;position:relative;top:-.18em;transition:transform .25s ease,top .25s ease}
-.projects details[open] summary h3::after{transform:rotate(-135deg);top:.02em}
+/* Ikon buka/tutup proyek */
+.projects summary::after{content:"";width:.62rem;height:.62rem;justify-self:end;flex:none;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-.1em,-.1em);transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .3s ease}
+.projects details[open] summary::after{transform:rotate(-135deg) translate(-.1em,-.1em);border-color:var(--accent)}
 
 /* Tablet & di bawahnya: header disusun dua baris, menu bisa digeser */
 @media (max-width:1000px){
@@ -145,3 +145,282 @@ body{overflow-wrap:break-word}
 .about p{max-width:44rem}
 .hero-actions{margin-top:1.5rem}
 .hero-actions .btn.ghost{display:inline-flex;align-items:center;gap:.55rem;margin:0}
+
+
+/* ===== Animasi & pratinjau langsung ===== */
+body{transition:background-color .35s ease,color .35s ease}
+
+/* Bar progres scroll */
+.progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:60;pointer-events:none;
+  transform-origin:0 50%;transform:scaleX(var(--p,0));
+  background:linear-gradient(90deg,var(--accent),var(--mark))}
+
+/* Menu aktif */
+nav a{position:relative}
+nav a.active{color:var(--ink)}
+nav a.active::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2px;border-radius:2px;background:var(--accent)}
+
+/* Header menempel di atas (layar lebar saja) */
+@media (min-width:1001px){
+  html{scroll-padding-top:5.5rem}
+  header.top{position:sticky;top:0;z-index:40;padding:1rem 0;
+    background:color-mix(in srgb,var(--bg) 82%,transparent);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+}
+
+/* Tombol & kotak pratinjau langsung */
+.live{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:1.1rem 0 1rem}
+.live .btn{margin:0;padding:.55rem 1.1rem;font:inherit;font-size:.95rem;cursor:pointer}
+.live button.btn:hover{background:var(--accent);color:var(--accent-ink);filter:brightness(1.08);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent),0 0 24px color-mix(in srgb,var(--accent) 55%,transparent)}
+.frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.frame[hidden]{display:none}
+.frame-bar{display:flex;align-items:center;gap:.4rem;padding:.55rem .8rem;border-bottom:1px solid var(--line)}
+.frame-bar i{width:.65rem;height:.65rem;border-radius:50%;background:var(--line)}
+.frame-url{margin-left:.6rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:.85rem;font-style:normal}
+.frame iframe{display:block;width:100%;height:min(70vh,640px);min-height:380px;border:0;background:#fff}
+.projects .body .frame-note{margin:0;padding:.6rem .9rem;max-width:none;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line)}
+
+@media (prefers-reduced-motion:no-preference){
+  /* Judul di bagian atas masuk satu per satu */
+  .hero h1 span{animation:rise .9s cubic-bezier(.2,.7,.2,1) backwards}
+  .hero h1 span:nth-child(1){animation-delay:.05s}
+  .hero h1 span:nth-child(2){animation-delay:.18s}
+  .hero h1 span:nth-child(3){animation-delay:.31s}
+  .hero-actions{animation:rise .9s cubic-bezier(.2,.7,.2,1) .5s backwards}
+  @keyframes rise{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:none}}
+
+  /* Cahaya lembut di belakang judul */
+  .hero{position:relative;isolation:isolate}
+  .hero::before{content:"";position:absolute;z-index:-1;right:0;top:-6%;width:min(34rem,78vw);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 26%,transparent),transparent);
+    filter:blur(24px);animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-8%,10%) scale(1.15)}}
+
+  /* Muncul saat di-scroll (kelas "js" dipasang oleh script.js) */
+  .js .reveal{opacity:0;transform:translateY(28px);
+    transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .js .reveal.in{opacity:1;transform:none}
+
+  /* Kolom keahlian muncul bergantian */
+  .js .sg.in .skills li{
+    animation:pop .5s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0)*60ms + 150ms)}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.92)}to{opacity:1;transform:none}}
+
+  /* Efek saat kursor di atas gambar proyek */
+  .projects .shot.has-img{transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+  .projects .shot.has-img img{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+  @media (hover:hover){
+    .projects .shot.has-img:hover{transform:translateY(-4px);border-color:var(--accent);
+      box-shadow:0 22px 44px -22px color-mix(in srgb,var(--accent) 60%,transparent)}
+    .projects .shot.has-img:hover img{transform:scale(1.03)}
+  }
+
+  /* Frame pratinjau muncul */
+  .frame:not([hidden]){animation:rise .5s cubic-bezier(.2,.7,.2,1) backwards}
+}
+
+
+/* ===== Animasi tambahan ===== */
+/* Tombol kembali ke atas */
+.to-top{position:fixed;right:1.2rem;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));z-index:45;width:2.75rem;height:2.75rem;
+  display:grid;place-items:center;border-radius:50%;cursor:pointer;color:var(--ink);background:var(--surface);border:1px solid var(--line);
+  opacity:0;visibility:hidden;transform:translateY(12px)}
+.to-top.show{opacity:1;visibility:visible;transform:none}
+.to-top:hover{color:var(--accent);border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 28%,transparent),0 0 20px color-mix(in srgb,var(--accent) 50%,transparent)}
+
+/* Transisi ganti tema (lingkaran melebar) */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-old(root){z-index:1}
+::view-transition-new(root){z-index:2}
+
+@media (prefers-reduced-motion:no-preference){
+  .to-top{transition:opacity .3s ease,transform .3s ease,visibility .3s,color .25s ease,border-color .25s ease,box-shadow .25s ease}
+
+  /* Menu turun satu per satu saat halaman dibuka */
+  header.top .logo,nav>*{animation:fall .6s cubic-bezier(.2,.7,.2,1) backwards}
+  header.top .logo{animation-delay:.1s}
+  nav>:nth-child(1){animation-delay:.2s}nav>:nth-child(2){animation-delay:.26s}nav>:nth-child(3){animation-delay:.32s}
+  nav>:nth-child(4){animation-delay:.38s}nav>:nth-child(5){animation-delay:.44s}nav>:nth-child(6){animation-delay:.5s}
+  @keyframes fall{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+
+  /* Kursor berkedip di teks jabatan */
+  .hero .role.typing::after{content:"";display:inline-block;width:.06em;height:.8em;margin-left:.08em;background:currentColor;
+    vertical-align:-.04em;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* Garis aksen di bawah judul bagian tumbuh saat muncul */
+  .js section>h2::after{content:"";display:block;width:0;height:3px;margin-top:.7rem;border-radius:3px;
+    background:linear-gradient(90deg,var(--accent),var(--mark));transition:width .9s cubic-bezier(.2,.7,.2,1) .3s}
+  .js section>h2.in::after{width:3.5rem}
+
+  /* Tombol magnet */
+  .hero-actions .btn.ghost{transition:box-shadow .25s ease,transform .25s ease,background .25s ease,color .25s ease,border-color .25s ease,translate .25s ease}
+  button.theme{transition:box-shadow .25s ease,border-color .25s ease,color .25s ease,translate .25s ease}
+
+  /* Gambar proyek miring 3D */
+  .projects .shot.has-img{transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+  @media (hover:hover){
+    .projects .shot.has-img:hover{transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-4px)}
+  }
+}
+
+
+/* ===== Gaya template: hero minimalis, daftar proyek, menu geser, layar pembuka ===== */
+html.intro-lock,html.menu-open{overflow:hidden}
+
+/* Hero: kalimat besar */
+.hero{min-height:min(82vh,48rem);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:3rem 0 5.5rem}
+.hero-label{margin:0 0 1.5rem;max-width:none;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hero .statement{font-family:var(--display);font-weight:700;font-size:clamp(2.2rem,6.4vw,5.4rem);line-height:1.04;letter-spacing:-.03em;margin:0 0 1.75rem;max-width:15em}
+.hero .statement em{font-style:normal;color:var(--accent)}
+.hero-sub{margin:0 0 2rem;max-width:36rem}
+.scroll-cue{position:absolute;left:0;bottom:1.5rem;display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:50%;border:1px solid var(--line);color:var(--ink);text-decoration:none}
+.scroll-cue:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Daftar proyek bernomor, satu baris per proyek */
+.projects{counter-reset:p}
+.projects details{counter-increment:p}
+.projects summary{grid-template-columns:auto 1fr auto auto;column-gap:1.5rem;align-items:center;transition:padding .35s ease}
+.projects summary::before{grid-column:1;grid-row:1}
+.projects summary h3{grid-column:2;grid-row:1}
+.projects summary .meta{grid-column:3;grid-row:1}
+.projects summary::after{grid-column:4;grid-row:1}
+.projects summary::before{content:counter(p,decimal-leading-zero);font-family:var(--display);font-size:1rem;letter-spacing:.08em;color:var(--muted)}
+.projects summary h3{font-size:clamp(1.6rem,4vw,2.8rem)}
+@media (hover:hover){.projects summary:hover{padding-left:.75rem}}
+
+/* Header: tombol Menu */
+.menu-btn{display:inline-flex;align-items:center;gap:.5rem}
+
+/* Menu geser */
+.scrim{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s .35s}
+.menu-open .scrim{opacity:1;visibility:visible;transition:opacity .35s ease}
+.panel{position:fixed;top:0;right:0;z-index:71;height:100%;width:min(26rem,100%);overflow-y:auto;padding:1.5rem 1.75rem 2rem;
+  background:var(--surface);border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;
+  transition:transform .5s cubic-bezier(.2,.7,.2,1),visibility 0s .5s}
+.menu-open .panel{transform:none;visibility:visible;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.panel-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem}
+.panel-brand{font-family:var(--display);font-weight:800;font-size:1.15rem}
+.panel-close{display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;cursor:pointer;color:var(--ink);background:none;border:1px solid var(--line)}
+.panel-close:hover{color:var(--accent);border-color:var(--accent)}
+.panel-label{margin:0 0 .8rem;font-size:.78rem;letter-spacing:.16em;color:var(--muted)}
+.panel-main,.panel-small{display:flex;flex-direction:column;margin-bottom:2.25rem}
+.panel a{text-decoration:none;color:var(--ink)}
+.panel a:hover{color:var(--accent)}
+.panel-main a{font-family:var(--display);font-weight:700;font-size:2.1rem;letter-spacing:-.02em;padding:.25rem 0}
+.panel-small a{font-size:1.15rem;padding:.3rem 0}
+
+/* Layar pembuka */
+.intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);transition:transform .9s cubic-bezier(.7,0,.2,1)}
+.intro.out{transform:translateY(-100%)}
+.intro>*{grid-area:1/1}
+.intro-load{display:flex;flex-direction:column;align-items:center;gap:.9rem;animation:introOut .4s ease 1.2s forwards}
+.intro-mark{font-family:var(--display);font-weight:800;font-size:clamp(2rem,7vw,3.8rem);letter-spacing:-.03em}
+.intro-text{font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.dots{display:flex;gap:.4rem}
+.dots i{width:.5rem;height:.5rem;border-radius:50%;background:var(--accent);animation:dot 1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.intro-prompt{display:flex;flex-direction:column;align-items:center;gap:1rem;cursor:pointer;background:none;border:0;color:var(--ink);font:inherit;
+  font-size:.85rem;letter-spacing:.16em;text-transform:uppercase;opacity:0;animation:introIn .6s ease 1.3s forwards}
+.intro-prompt b{display:grid;place-items:center;width:3rem;height:3rem;border-radius:50%;border:1px solid var(--line);animation:nudge 1.4s ease-in-out infinite}
+.intro-prompt:hover b{border-color:var(--accent);color:var(--accent)}
+@keyframes introOut{to{opacity:0;visibility:hidden}}
+@keyframes introIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes dot{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media (prefers-reduced-motion:no-preference){
+  /* Isi hero masuk berurutan setelah layar pembuka naik */
+  .hx{animation:rise .9s cubic-bezier(.2,.7,.2,1) backwards}
+  .hero>.hx:nth-child(1){animation-delay:.05s}.hero>.hx:nth-child(2){animation-delay:.15s}
+  .hero>.hx:nth-child(3){animation-delay:.3s}.hero>.hx:nth-child(4){animation-delay:.42s}
+  .intro-wait .hx{animation:none;opacity:0}
+  .scroll-cue svg{animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+  .menu-open .panel a{animation:inx .5s cubic-bezier(.2,.7,.2,1) backwards}
+  .panel a:nth-child(1){animation-delay:.15s}.panel a:nth-child(2){animation-delay:.2s}
+  .panel a:nth-child(3){animation-delay:.25s}.panel a:nth-child(4){animation-delay:.3s}
+  @keyframes inx{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+}
+
+/* Tablet & ponsel: header satu baris (logo + Tema + Menu), menu lewat panel geser */
+@media (max-width:1000px){
+  header.top{flex-direction:row;align-items:center;justify-content:space-between;gap:.75rem}
+  header.top .logo{font-size:.85rem;line-height:1.3;max-width:52%}
+  nav{width:auto;overflow:visible;margin:0;padding:0;gap:.5rem;flex-wrap:nowrap}
+  nav a{display:none}
+}
+@media (max-width:720px){
+  .hero{min-height:auto;padding:2rem 0 5rem}
+  .projects summary{grid-template-columns:auto 1fr auto;row-gap:.35rem}
+  .projects summary .meta{grid-column:2 / 4;grid-row:2;text-align:left}
+  .projects summary::after{grid-column:3;grid-row:1}
+  .panel-main a{font-size:1.8rem}
+}
+
+
+/* Nama besar di bagian atas */
+.hero .statement{font-size:clamp(2.6rem,8.5vw,7rem);line-height:1;max-width:none}
+
+
+/* ===== Fase 1: aksesibilitas & accordion proyek ===== */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+
+.skip{position:fixed;left:1rem;top:calc(1rem + env(safe-area-inset-top,0px));z-index:200;
+  display:inline-block;padding:.7rem 1.1rem;border-radius:8px;text-decoration:none;font-weight:600;
+  background:var(--accent);color:var(--accent-ink);transform:translateY(-200%);transition:transform .25s ease}
+.skip:focus{transform:translateY(0)}
+
+button.theme[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.panel a.active,.panel a[aria-current="true"]{color:var(--accent)}
+
+.projects summary{scroll-margin-top:6rem}
+.projects .project-panel{overflow:visible}
+.projects .project-panel.animating{overflow:clip}
+
+
+/* ===== Dua view: Beranda & Portofolio ===== */
+html.js .view{display:none}
+html.js .view.is-active{display:block}
+html.js .view-home.is-active{display:flex;flex-direction:column;justify-content:center}
+
+.view-home{min-height:calc(100svh - 5.5rem);padding:0;border-top:0}
+.view-home .hero{min-height:0;padding:2rem 0 3rem;flex:1}
+
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem}
+.hero-actions .btn{margin:0}
+.hero-actions .btn svg{width:1.1em;height:1.1em}
+
+.work-top{display:flex;align-items:center;padding:1.4rem 0}
+.back-home{display:inline-flex;align-items:center;gap:.55rem;padding:.5rem 1rem;border-radius:999px;
+  border:1px solid var(--line);color:var(--muted);text-decoration:none;font-weight:500;font-size:.95rem;
+  transition:color .25s ease,border-color .25s ease,background .25s ease,box-shadow .25s ease}
+.back-home:hover{color:var(--accent);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.back-home svg{width:1.05em;height:1.05em}
+
+#portofolio section{scroll-margin-top:5.5rem}
+.view:focus,.view h1:focus,.view h2:focus,[tabindex="-1"]:focus{outline:none}
+
+html.js[data-view="home"] .progress{opacity:0;visibility:hidden}
+.progress{transition:opacity .3s ease,visibility .3s}
+
+/* Tirai transisi antar view */
+.curtain{position:fixed;inset:0;z-index:90;overflow:hidden;pointer-events:auto}
+.curtain[hidden]{display:none}
+.curtain-panel{position:absolute;inset:0;transform:translateY(101%);will-change:transform}
+.curtain-panel:nth-child(1){background:var(--bg)}
+.curtain-panel:nth-child(2){background:var(--surface)}
+.curtain-panel:nth-child(3){background:linear-gradient(160deg,var(--accent),color-mix(in srgb,var(--accent) 55%,var(--bg)))}
+
+.curtain.is-covering .curtain-panel{transform:translateY(0);transition:transform .5s cubic-bezier(.7,0,.2,1)}
+.curtain.is-covering .curtain-panel:nth-child(1){transition-delay:0s}
+.curtain.is-covering .curtain-panel:nth-child(2){transition-delay:.06s}
+.curtain.is-covering .curtain-panel:nth-child(3){transition-delay:.12s}
+
+.curtain.is-revealing .curtain-panel{transform:translateY(-101%);transition:transform .55s cubic-bezier(.7,0,.2,1)}
+.curtain.is-revealing .curtain-panel:nth-child(3){transition-delay:0s}
+.curtain.is-revealing .curtain-panel:nth-child(2){transition-delay:.06s}
+.curtain.is-revealing .curtain-panel:nth-child(1){transition-delay:.12s}
