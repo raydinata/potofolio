@@ -1,16 +1,11 @@
 (function () {
   'use strict';
-
-  /* ============================================================
-     LIVE PREVIEW
-     Isi link situs yang sudah online di antara tanda kutip.
-     Contoh: langkahstore: 'https://langkahstore.contoh.com/'
-     Kosong = tombol pratinjau tidak ditampilkan.
-     ============================================================ */
+  
   var LIVE_PREVIEW = {
     langkahstore: '',
     sinarexpress: '',
-    spk: ''
+    spk: '',
+    'portofolio-web': ''
   };
 
   var root = document.documentElement;
